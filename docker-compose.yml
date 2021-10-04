@@ -1,0 +1,62 @@
+version: '3.7'
+services:
+  BoaEntrega.GSL.Notificacoes:
+    image: boaentrega/services/notificacoes:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.Notificacoes/Dockerfile
+      context: .
+    container_name: notificacoes
+
+ # BoaEntrega.GSL.Cadastros:
+ #   image: boaentrega/services/cadastros:service
+ #   build: ./src/BoaEntrega.GSL.Cadastros
+ #   container_name: cadastros
+
+ # BoaEntrega.GSL.Mercadorias:
+ #   image: boaentrega/services/mercadorias:service
+ #   build: ./src/BoaEntrega.GSL.Mercadorias
+ #   container_name: mercadorias
+
+  BoaEntrega.GSL.ApiGateway:
+    image: boaentrega/services/api-gateway:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.ApiGateway/Dockerfile
+      context: .
+    container_name: api-gateway
+    ports:
+        - 9000:9000
+
+  sqlserver:
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_DATABASE=BoaEntrega
+      - MSSQL_DATA_DIR=/var/opt/mssql
+      - MSSQL_INIT_LOG_LEVEL=0
+      - MSSQL_LOG_LEVEL=0
+      - MSSQL_TCP_PORT=1433
+      - MSSQL_TCP_PORT_EXTERNAL=1433
+      - MSSQL_TCP_PORT_EXTERNAL_WEB=1433
+      - MSSQL_TCP_PORT_WEB=1433
+    ports:
+      - "1433:1433"
+
+  eventstore.db:
+    container_name: eventstore
+    image: eventstore/eventstore:21.6.0-buster-slim
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_EXT_TCP_PORT=1113
+      - EVENTSTORE_HTTP_PORT=2113
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - "1113:1113"
+      - "2113:2113"

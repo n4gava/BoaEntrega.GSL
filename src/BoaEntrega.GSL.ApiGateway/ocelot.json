@@ -1,0 +1,45 @@
+{
+  "GlobalConfiguration": {},
+  "Routes": [
+    {
+      "ServiceName": "",
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "host.docker.internal",
+          //"Host": "notificacoes",
+          "Port": 9003
+        }
+      ],
+      "UpstreamPathTemplate": "/notificacoes/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "ServiceName": "",
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cadastros",
+          "Port": 9001
+        }
+      ],
+      "UpstreamPathTemplate": "/cadastros/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "ServiceName": "",
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "mercadorias",
+          "Port": 9002
+        }
+      ],
+      "UpstreamPathTemplate": "/mercadorias/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    }
+  ]
+}
