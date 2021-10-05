@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BoaEntrega.GSL.Core.Consul;
 using BoaEntrega.GSL.Identidade.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -27,13 +28,16 @@ namespace BoaEntrega.GSL.Cadastros
 
         public IConfiguration Configuration { get; }
 
+        public ConsulSettings ConsulSettings { get; set; }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            ConsulSettings = services.ConfigureConsulSettings(Configuration);
+            services.AddConsulSettings(ConsulSettings);
             services.AddDbContext<IdentidadeContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<IdentidadeContext>();
 
             services.Configure<IdentityOptions>(options =>
@@ -58,22 +62,24 @@ namespace BoaEntrega.GSL.Cadastros
                 {
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 };
             });
 
             services.AddControllers();
+            services.AddOptions();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IdentidadeContext dbContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            dbContext.Database.Migrate();
+            app.UseConsul(ConsulSettings);
             app.UseRouting();
 
             app.UseAuthorization();

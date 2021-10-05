@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BoaEntrega.GSL.Core.Consul;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +22,14 @@ namespace BoaEntrega.GSL.Mercadorias
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        public ConsulSettings ConsulSettings { get; set; }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            ConsulSettings = services.ConfigureConsulSettings(Configuration);
+            services.AddConsulSettings(ConsulSettings);
             services.AddControllers();
+            services.AddOptions();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,6 +40,7 @@ namespace BoaEntrega.GSL.Mercadorias
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseConsul(ConsulSettings);
             app.UseRouting();
 
             app.UseAuthorization();

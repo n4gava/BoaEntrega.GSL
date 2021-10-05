@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using BoaEntrega.GSL.Core.Consul;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,14 +17,19 @@ namespace BoaEntrega.GSL.Notificacoes
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        public ConsulSettings ConsulSettings { get; set; }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            ConsulSettings = services.ConfigureConsulSettings(Configuration);
+            services.AddConsulSettings(ConsulSettings);
+
             services.AddControllers().AddJsonOptions(opts =>
             {
                 var enumConverter = new JsonStringEnumConverter();
                 opts.JsonSerializerOptions.Converters.Add(enumConverter);
             });
+            services.AddOptions();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +40,7 @@ namespace BoaEntrega.GSL.Notificacoes
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseConsul(ConsulSettings);
             app.UseRouting();
 
             app.UseAuthorization();

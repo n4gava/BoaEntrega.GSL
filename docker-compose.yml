@@ -1,31 +1,12 @@
 version: '3.7'
 services:
-  BoaEntrega.GSL.Notificacoes:
-    image: boaentrega/services/notificacoes:service
-    build: 
-      dockerfile: ./src/BoaEntrega.GSL.Notificacoes/Dockerfile
-      context: .
-    container_name: notificacoes
-
- # BoaEntrega.GSL.Cadastros:
- #   image: boaentrega/services/cadastros:service
- #   build: ./src/BoaEntrega.GSL.Cadastros
- #   container_name: cadastros
-
- # BoaEntrega.GSL.Mercadorias:
- #   image: boaentrega/services/mercadorias:service
- #   build: ./src/BoaEntrega.GSL.Mercadorias
- #   container_name: mercadorias
-
-  BoaEntrega.GSL.ApiGateway:
-    image: boaentrega/services/api-gateway:service
-    build: 
-      dockerfile: ./src/BoaEntrega.GSL.ApiGateway/Dockerfile
-      context: .
-    container_name: api-gateway
+  consul:
+    container_name: consul
+    image: consul
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
     ports:
-        - 9000:9000
-
+      - "8500:8500"
+  
   sqlserver:
     container_name: sqlserver
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -44,6 +25,57 @@ services:
       - MSSQL_TCP_PORT_WEB=1433
     ports:
       - "1433:1433"
+
+  BoaEntrega.GSL.Identidade1:
+    image: boaentrega/services/identidade:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.Identidade/Dockerfile
+      context: .
+    container_name: identidade1
+    environment:
+      - ConsulSettings__ServiceId=identidade-service-1
+      - ConsulSettings__ServiceName=identidade-service
+      - ConsulSettings__ServiceHost=identidade1
+      - ConsulSettings__ServicePort=9004
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+
+  BoaEntrega.GSL.Identidade2:
+    image: boaentrega/services/identidade:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.Identidade/Dockerfile
+      context: .
+    container_name: identidade2
+    environment:
+      - ConsulSettings__ServiceId=identidade-service-2
+      - ConsulSettings__ServiceName=identidade-service
+      - ConsulSettings__ServiceHost=identidade2
+      - ConsulSettings__ServicePort=9004
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+
+  BoaEntrega.GSL.Notificacoes:
+    image: boaentrega/services/notificacoes:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.Notificacoes/Dockerfile
+      context: .
+    container_name: notificacoes
+    environment:
+      - ConsulSettings__ServiceId=notificacoes-service-1
+      - ConsulSettings__ServiceName=notificacoes-service
+      - ConsulSettings__ServiceHost=notificacoes
+      - ConsulSettings__ServicePort=9003
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+
+  BoaEntrega.GSL.ApiGateway:
+    image: boaentrega/services/api-gateway:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.ApiGateway/Dockerfile
+      context: .
+    container_name: api-gateway
+    environment:
+      - GlobalConfiguration__Host=consul
+      - GlobalConfiguration__Port=8500
+    ports:
+        - 9000:9000
 
   eventstore.db:
     container_name: eventstore
