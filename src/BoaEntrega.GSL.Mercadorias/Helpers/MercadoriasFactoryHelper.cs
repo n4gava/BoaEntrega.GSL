@@ -1,7 +1,6 @@
-﻿using System;
+﻿using PricingService.Models;
+using System;
 using System.Collections.Generic;
-
-using PricingService.Models;
 
 namespace PricingService.Helpers
 {

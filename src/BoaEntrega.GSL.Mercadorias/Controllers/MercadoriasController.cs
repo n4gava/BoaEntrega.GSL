@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.AspNetCore.Mvc;
-
+﻿using Microsoft.AspNetCore.Mvc;
 using PricingService.Helpers;
 using PricingService.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BoaEntrega.GSL.Mercadorias.Controllers
 {

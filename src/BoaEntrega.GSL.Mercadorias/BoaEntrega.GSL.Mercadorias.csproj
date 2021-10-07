@@ -10,5 +10,9 @@
     <ProjectReference Include="..\BoaEntrega.GSL.Core\BoaEntrega.GSL.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Context\" />
+  </ItemGroup>
+
 
 </Project>

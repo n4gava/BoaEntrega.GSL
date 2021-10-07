@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace BoaEntrega.GSL.Cadastros
+namespace BoaEntrega.GSL.Cadastros.WebApi
 {
     public class Program
     {

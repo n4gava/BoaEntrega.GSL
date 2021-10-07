@@ -18,5 +18,6 @@ docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "boaentre
 
 rodar os testes de carga
 ```
-cat tests\load-test\script.js | docker run -i loadimpact/k6 run --vus 20 --duration 30s -
+cat tests\load-test\script.js | docker run -i --rm loadimpact/k6 run --vus 20 --duration 30s -
 ```
+

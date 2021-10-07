@@ -1,17 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BoaEntrega.GSL.Cadastros.Data;
+using BoaEntrega.GSL.Cadastros.Data.Repositories;
+using BoaEntrega.GSL.Cadastros.Domain;
+using BoaEntrega.GSL.Cadastros.Domain.Services;
 using BoaEntrega.GSL.Core.Consul;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using System;
+using System.IO;
+using System.Reflection;
 
-namespace BoaEntrega.GSL.Cadastros
+namespace BoaEntrega.GSL.Cadastros.WebApi
 {
     public class Startup
     {
@@ -27,9 +32,27 @@ namespace BoaEntrega.GSL.Cadastros
         public void ConfigureServices(IServiceCollection services)
         {
             ConsulSettings = services.ConfigureConsulSettings(Configuration);
+            services.AddDbContext<CadastrosContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddConsulSettings(ConsulSettings);
-            services.AddControllers();
+            services.AddControllers()
+                    .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                    .AddRouteComponents("api", GetEdmModel())
+                );
             services.AddOptions();
+            services.AddSwaggerGen(c =>
+            {
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
+            services.AddAutoMapper(this.GetType().Assembly);
+
+            services.AddScoped<IClienteRepository, ClienteRepository>();
+            services.AddScoped<IClienteServices, ClienteServices>();
+            services.AddScoped<IFornecedorRepository, FornecedorRepository>();
+            services.AddScoped<IFornecedorServices, FornecedorServices>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,14 +64,26 @@ namespace BoaEntrega.GSL.Cadastros
             }
 
             app.UseConsul(ConsulSettings);
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
             app.UseRouting();
 
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+        }
+
+        public static IEdmModel GetEdmModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Cliente>("clientes");
+            builder.EntitySet<Fornecedor>("fornecedores");
+            return builder.GetEdmModel();
         }
     }
 }

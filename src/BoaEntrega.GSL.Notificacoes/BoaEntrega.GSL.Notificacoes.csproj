@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BoaEntrega.GSL.Core\BoaEntrega.GSL.Core.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\EventBus\EventBus.csproj" />
   </ItemGroup>
 
 

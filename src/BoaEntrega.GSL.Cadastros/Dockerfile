@@ -1,8 +1,8 @@
 # Stage 1
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /build
-EXPOSE 9001
-COPY . .
+COPY . . 
+WORKDIR /build/src/BoaEntrega.GSL.Cadastros.WebApi
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app
 
@@ -11,4 +11,4 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS final
 WORKDIR /app
 EXPOSE 9001
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "BoaEntrega.GSL.Cadastros.dll"]
+ENTRYPOINT ["dotnet", "BoaEntrega.GSL.Cadastros.WebApi.dll"]

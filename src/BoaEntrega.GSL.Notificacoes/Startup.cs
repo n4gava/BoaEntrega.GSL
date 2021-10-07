@@ -1,10 +1,13 @@
-using System.Text.Json.Serialization;
 using BoaEntrega.GSL.Core.Consul;
+using BoaEntrega.GSL.Notificacoes.Controllers;
+using EventBus;
+using EventBusRabbitMQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Text.Json.Serialization;
 
 namespace BoaEntrega.GSL.Notificacoes
 {
@@ -30,6 +33,14 @@ namespace BoaEntrega.GSL.Notificacoes
                 opts.JsonSerializerOptions.Converters.Add(enumConverter);
             });
             services.AddOptions();
+            services.AddRabbitMQEventBus(Configuration);
+            services.AddTransient<EventoTesteHandler>();
+        }
+
+        protected virtual void ConfigureEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+            eventBus.Subscribe<EventoTeste, EventoTesteHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +60,8 @@ namespace BoaEntrega.GSL.Notificacoes
             {
                 endpoints.MapControllers();
             });
+
+            ConfigureEventBus(app);
         }
     }
 }

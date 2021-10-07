@@ -47,7 +47,7 @@ namespace BoaEntrega.GSL.Identidade.Controllers
                     }
                 }
             }
-            
+
             var user = new IdentityUser
             {
                 UserName = registerUser.Email,

@@ -1,5 +1,4 @@
 ﻿using BoaEntrega.GSL.Core.DomainObjects;
-using System;
 
 namespace PricingService.Models
 {

@@ -12,7 +12,7 @@ namespace BoaEntrega.GSL.Identidade.Data
 
         }
 
-        public async Task<bool> CommitAsync()
+        public async Task<bool> Commit()
         {
             var success = await SaveChangesAsync() > 0;
 

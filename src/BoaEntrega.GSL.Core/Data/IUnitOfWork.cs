@@ -4,6 +4,6 @@ namespace BoaEntrega.GSL.Core.Data
 {
     public interface IUnitOfWork
     {
-        Task<bool> CommitAsync();
+        Task<bool> Commit();
     }
 }
