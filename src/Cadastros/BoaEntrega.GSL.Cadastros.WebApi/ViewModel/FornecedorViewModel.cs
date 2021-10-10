@@ -1,4 +1,4 @@
-﻿using BoaEntrega.GSL.Cadastros.Domain;
+﻿using BoaEntrega.GSL.Core.DomainObjects;
 
 namespace BoaEntrega.GSL.Cadastros.ViewModel
 {

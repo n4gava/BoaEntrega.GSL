@@ -63,6 +63,16 @@
       "LoadBalancerOptions": {
         "Type": "LeastConnection"
       },
+      "DownstreamPathTemplate": "/api/mercadorias/{codigo-rastreamento}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/mercadorias/api/mercadorias/{codigo-rastreamento}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "ServiceName": "mercadoria-service",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
       "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "http",
       "UpstreamPathTemplate": "/mercadorias/{everything}",

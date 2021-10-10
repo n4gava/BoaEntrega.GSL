@@ -1,5 +1,6 @@
 ﻿using BoaEntrega.GSL.Cadastros.Domain;
 using BoaEntrega.GSL.Core.Data;
+using BoaEntrega.GSL.Core.DomainObjects;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 

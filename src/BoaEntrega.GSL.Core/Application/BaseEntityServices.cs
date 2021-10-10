@@ -36,11 +36,11 @@ namespace BoaEntrega.GSL.Core.Application
 
         public virtual async Task<bool> Excluir(Guid uid, Guid id)
         {
-            var cliente = _repository.ObterPorId(id);
-            if (cliente == null)
+            var entity = _repository.ObterPorId(id);
+            if (entity == null)
                 return true;
 
-            _repository.Remover(cliente);
+            _repository.Remover(entity);
             return await _repository.UnitOfWork.Commit();
         }
 
