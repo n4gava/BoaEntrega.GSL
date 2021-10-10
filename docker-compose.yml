@@ -7,8 +7,8 @@ services:
     ports:
       - 8500:8500
   
-  sqlserver:
-    container_name: sqlserver
+  sqlserver-cadastros:
+    container_name: sqlserver-cadastros
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - ACCEPT_EULA=Y
@@ -25,6 +25,25 @@ services:
       - MSSQL_TCP_PORT_WEB=1433
     ports:
       - 1433:1433
+
+  sqlserver-notificacoes:
+    container_name: sqlserver-notificacoes
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_DATABASE=BoaEntrega
+      - MSSQL_DATA_DIR=/var/opt/mssql
+      - MSSQL_INIT_LOG_LEVEL=0
+      - MSSQL_LOG_LEVEL=0
+      - MSSQL_TCP_PORT=1434
+      - MSSQL_TCP_PORT_EXTERNAL=1434
+      - MSSQL_TCP_PORT_EXTERNAL_WEB=1434
+      - MSSQL_TCP_PORT_WEB=1434
+    ports:
+      - 1434:1434      
 
   BoaEntrega.GSL.Identidade1:
     image: boaentrega/services/identidade:service
@@ -54,7 +73,8 @@ services:
       - ConsulSettings__ServicePort=9004
       - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
     depends_on:
-      - "consul"      
+      - "consul"  
+      - "identidade1"    
 
   BoaEntrega.GSL.Notificacoes:
     image: boaentrega/services/notificacoes:service
@@ -70,6 +90,36 @@ services:
       - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
     depends_on:
       - "consul"      
+
+  BoaEntrega.GSL.Cadastros1:
+    image: boaentrega/services/cadastros:service
+    build: 
+      dockerfile: ./src/Cadastros/BoaEntrega.GSL.Cadastros.WebApi/Dockerfile
+      context: .
+    container_name: cadastros1
+    environment:
+      - ConsulSettings__ServiceId=cadastros-service-1
+      - ConsulSettings__ServiceName=cadastros-service
+      - ConsulSettings__ServiceHost=cadastros1
+      - ConsulSettings__ServicePort=9001
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+
+  BoaEntrega.GSL.Cadastros2:
+    image: boaentrega/services/cadastros:service
+    build: 
+      dockerfile: ./src/Cadastros/BoaEntrega.GSL.Cadastros.WebApi/Dockerfile
+      context: .
+    container_name: cadastros2
+    environment:
+      - ConsulSettings__ServiceId=cadastros-service-2
+      - ConsulSettings__ServiceName=cadastros-service
+      - ConsulSettings__ServiceHost=cadastros2
+      - ConsulSettings__ServicePort=9001
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
 
   BoaEntrega.GSL.ApiGateway:
     image: boaentrega/services/api-gateway:service

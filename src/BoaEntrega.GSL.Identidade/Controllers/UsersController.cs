@@ -29,6 +29,11 @@ namespace BoaEntrega.GSL.Identidade.Controllers
             _roleManager = roleManager;
         }
 
+        /// <summary>
+        /// Registra um novo usuário
+        /// </summary>
+        /// <param name="registerUser">Informações para registrar um novo usuário</param>
+        /// <returns>Resultado da inclusão do usuário</returns>
         [HttpPost]
         [Route("register")]
         public async Task<ActionResult> Register(RegisterUser registerUser)
@@ -79,6 +84,11 @@ namespace BoaEntrega.GSL.Identidade.Controllers
             return BadRequest(string.Join("; ", errors));
         }
 
+        /// <summary>
+        /// Realiza o login na aplicação
+        /// </summary>
+        /// <param name="loginUser">Dados do login</param>
+        /// <returns>Token de acesso</returns>
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login(LoginUser loginUser)
@@ -87,9 +97,7 @@ namespace BoaEntrega.GSL.Identidade.Controllers
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(loginUser.Email);
-
-                var fullJwt = await GetFullJwt(user.Email);
+                var fullJwt = await GetFullJwt(loginUser.Email);
 
                 return Ok(fullJwt);
             }
@@ -118,6 +126,7 @@ namespace BoaEntrega.GSL.Identidade.Controllers
             var claimsIdentity = new ClaimsIdentity();
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.NameId, user.Id));
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            claimsIdentity.AddClaim(new Claim("uid", user.Id));
 
             var tokenDescription = new SecurityTokenDescriptor
             {

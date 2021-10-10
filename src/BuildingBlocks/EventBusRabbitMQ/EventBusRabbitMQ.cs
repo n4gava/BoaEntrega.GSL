@@ -1,4 +1,5 @@
 ﻿using EventBus;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Polly;
@@ -21,12 +22,12 @@ namespace EventBusRabbitMQ
         private readonly ILogger<EventBusRabbitMQ> _logger;
         private readonly IEventBusSubscriptionsManager _subsManager;
         private readonly int _retryCount;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceCollection _serviceCollection;
         private IModel _consumerChannel;
         private string _queueName;
 
         public EventBusRabbitMQ(IRabbitMQPersistentConnection persistentConnection, ILogger<EventBusRabbitMQ> logger,
-            IServiceProvider serviceProvider, IEventBusSubscriptionsManager subsManager, string queueName = null, int retryCount = 5)
+            IServiceCollection serviceCollection, IEventBusSubscriptionsManager subsManager, string queueName = null, int retryCount = 5)
         {
             _persistentConnection = persistentConnection ?? throw new ArgumentNullException(nameof(persistentConnection));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -35,7 +36,7 @@ namespace EventBusRabbitMQ
             _consumerChannel = CreateConsumerChannel();
             _retryCount = retryCount;
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;
-            _serviceProvider = serviceProvider;
+            _serviceCollection = serviceCollection;
         }
 
         private void SubsManager_OnEventRemoved(object sender, string eventName)
@@ -89,7 +90,7 @@ namespace EventBusRabbitMQ
                 policy.Execute(() =>
                 {
                     var properties = channel.CreateBasicProperties();
-                    properties.DeliveryMode = 2; // persistent
+                    properties.DeliveryMode = 2; // 
 
                     _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
 
@@ -160,25 +161,17 @@ namespace EventBusRabbitMQ
         {
             var eventName = eventArgs.RoutingKey;
             var message = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
-
             try
             {
-                if (message.ToLowerInvariant().Contains("throw-fake-exception"))
-                {
-                    throw new InvalidOperationException($"Fake exception requested: \"{message}\"");
-                }
-
                 await ProcessEvent(eventName, message);
+                _consumerChannel.BasicAck(eventArgs.DeliveryTag, multiple: false);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "----- ERROR Processing message \"{Message}\"", message);
+                await Task.Delay(TimeSpan.FromSeconds(10));
+                _consumerChannel.BasicReject(eventArgs.DeliveryTag, true);
             }
-
-            // Even on exception we take the message off the queue.
-            // in a REAL WORLD app this should be handled with a Dead Letter Exchange (DLX). 
-            // For more information see: https://www.rabbitmq.com/dlx.html
-            _consumerChannel.BasicAck(eventArgs.DeliveryTag, multiple: false);
         }
 
         private IModel CreateConsumerChannel()
@@ -222,29 +215,18 @@ namespace EventBusRabbitMQ
                 var subscriptions = _subsManager.GetHandlersForEvent(eventName);
                 foreach (var subscription in subscriptions)
                 {
-                    /*
-                    if (subscription.IsDynamic)
+                    var serviceProvider = _serviceCollection.BuildServiceProvider();
+                    using (var serviceScope = serviceProvider.CreateScope())
                     {
-                        var handler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
+                        var handler = serviceScope.ServiceProvider.GetService(subscription.HandlerType);
                         if (handler == null) continue;
-                        dynamic eventData = JObject.Parse(message);
+                        var eventType = _subsManager.GetEventTypeByName(eventName);
+                        var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
                         await Task.Yield();
-                        await handler.Handle(eventData);
+                        await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
                     }
-                    else
-                    {
-                    */
-
-                    var handler = _serviceProvider.GetService(subscription.HandlerType);
-                    if (handler == null) continue;
-                    var eventType = _subsManager.GetEventTypeByName(eventName);
-                    var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-
-                    await Task.Yield();
-                    await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
-                    //}
                 }
             }
             else

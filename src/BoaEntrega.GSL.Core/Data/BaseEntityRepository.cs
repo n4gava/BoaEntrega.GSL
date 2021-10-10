@@ -37,7 +37,8 @@ namespace BoaEntrega.GSL.Core.Data
 
         public void Atualizar(T entity)
         {
-            _dbSet.Update(entity);
+            var entry = _dbSet.First(e => e.Id == entity.Id);
+            _context.Entry(entry).CurrentValues.SetValues(entity);
         }
 
         public void Remover(T entity)

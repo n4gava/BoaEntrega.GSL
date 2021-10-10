@@ -1,4 +1,5 @@
-﻿using BoaEntrega.GSL.Core.Data;
+﻿using AutoMapper;
+using BoaEntrega.GSL.Core.Data;
 using BoaEntrega.GSL.Core.DomainObjects;
 using System;
 using System.Linq;
@@ -15,21 +16,25 @@ namespace BoaEntrega.GSL.Core.Application
             _repository = repository;
         }
 
-        public async Task<bool> Adicionar(T entity)
+        public virtual async Task<bool> Adicionar(Guid uid, T entity)
         {
             _repository.Adicionar(entity);
             return await _repository.UnitOfWork.Commit();
         }
 
-        public async Task<bool> Atualizar(Guid id, T entity)
+        public virtual async Task<bool> Atualizar(Guid uid, Guid id, T entity)
         {
-            entity.Id = id;
+            var currentEntity = _repository.ObterPorId(id);
+            if (currentEntity == null)
+                return false;
+
+            entity.Id = currentEntity.Id;
             _repository.Atualizar(entity);
             return await _repository.UnitOfWork.Commit();
         }
 
 
-        public async Task<bool> Excluir(Guid id)
+        public virtual async Task<bool> Excluir(Guid uid, Guid id)
         {
             var cliente = _repository.ObterPorId(id);
             if (cliente == null)
@@ -39,12 +44,12 @@ namespace BoaEntrega.GSL.Core.Application
             return await _repository.UnitOfWork.Commit();
         }
 
-        public T ObterPorId(Guid id)
+        public virtual T ObterPorId(Guid id)
         {
             return _repository.ObterPorId(id);
         }
 
-        public IQueryable<T> ObterTodos()
+        public virtual IQueryable<T> ObterTodos()
         {
             return _repository.ObterTodos();
         }

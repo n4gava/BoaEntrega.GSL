@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BoaEntrega.GSL.Core\BoaEntrega.GSL.Core.csproj" />
+  </ItemGroup>
+
+</Project>

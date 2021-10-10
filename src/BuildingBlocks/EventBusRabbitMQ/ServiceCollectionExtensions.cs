@@ -44,7 +44,7 @@ namespace EventBusRabbitMQ
 
                 var retryCount = 5;
 
-                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, sp, eventBusSubcriptionsManager, subscriptionClientName, retryCount);
+                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, serviceCollection, eventBusSubcriptionsManager, subscriptionClientName, retryCount);
             });
             serviceCollection.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
             return serviceCollection;

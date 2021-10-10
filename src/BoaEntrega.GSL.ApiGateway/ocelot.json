@@ -19,7 +19,7 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     },
     {
-      "ServiceName": "notificacoes-service",
+      "ServiceName": "notificacao-service",
       "LoadBalancerOptions": {
         "Type": "LeastConnection"
       },
@@ -30,6 +30,12 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "BaseAuth",
         "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "Admin , Usuario"
+      },
+      "AddHeadersToRequest": {
+        "uid": "Claims[uid] > value > |"
       }
     },
     {
@@ -44,10 +50,16 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "BaseAuth",
         "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "Admin , Usuario"
+      },
+      "AddHeadersToRequest": {
+        "uid": "Claims[uid] > value > |"
       }
     },
     {
-      "ServiceName": "mercadorias-service",
+      "ServiceName": "mercadoria-service",
       "LoadBalancerOptions": {
         "Type": "LeastConnection"
       },
@@ -58,6 +70,12 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "BaseAuth",
         "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "Admin , Usuario"
+      },
+      "AddHeadersToRequest": {
+        "uid": "Claims[uid] > value > |"
       }
     }
   ]

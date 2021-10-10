@@ -11,10 +11,10 @@ namespace BoaEntrega.GSL.Core.Application
 
         T ObterPorId(Guid id);
 
-        Task<bool> Adicionar(T cliente);
+        Task<bool> Adicionar(Guid uid, T entity);
 
-        Task<bool> Atualizar(Guid id, T cliente);
+        Task<bool> Atualizar(Guid uid, Guid id, T entity);
 
-        Task<bool> Excluir(Guid id);
+        Task<bool> Excluir(Guid uid, Guid id);
     }
 }

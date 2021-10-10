@@ -6,9 +6,13 @@ namespace BoaEntrega.GSL.Core.DomainObjects
     {
         public Guid Id { get; set; }
 
+        public DateTimeOffset DataCriacao { get; set; }
+
+
         protected Entity()
         {
             Id = Guid.NewGuid();
+            DataCriacao = DateTimeOffset.Now;
         }
     }
 }
