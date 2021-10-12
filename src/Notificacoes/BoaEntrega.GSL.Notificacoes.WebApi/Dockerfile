@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /build
 COPY . . 
-WORKDIR /build/src/Notificacoes/BoaEntrega.GSL.Notificacoes
+WORKDIR /build/src/Notificacoes/BoaEntrega.GSL.Notificacoes.WebApi
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app
 
