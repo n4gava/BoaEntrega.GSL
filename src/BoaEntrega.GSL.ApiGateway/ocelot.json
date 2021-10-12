@@ -1,0 +1,92 @@
+{
+  "GlobalConfiguration": {
+    "ServiceDiscoveryProvider": {
+      "Schema": "http",
+      "Host": "consul",
+      "Port": 8500,
+      "Type": "Consul"
+    }
+  },
+  "Routes": [
+    {
+      "ServiceName": "identidade-service",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/identidade/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "ServiceName": "notificacao-service",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/notificacoes/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "BaseAuth",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "Admin , Usuario"
+      },
+      "AddHeadersToRequest": {
+        "uid": "Claims[uid] > value > |"
+      }
+    },
+    {
+      "ServiceName": "cadastros-service",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/cadastros/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "BaseAuth",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "Admin , Usuario"
+      },
+      "AddHeadersToRequest": {
+        "uid": "Claims[uid] > value > |"
+      }
+    },
+    {
+      "ServiceName": "mercadoria-service",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
+      "DownstreamPathTemplate": "/api/mercadorias/{codigo-rastreamento}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/mercadorias/api/mercadorias/{codigo-rastreamento}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "ServiceName": "mercadoria-service",
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/mercadorias/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "BaseAuth",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "Admin , Usuario"
+      },
+      "AddHeadersToRequest": {
+        "uid": "Claims[uid] > value > |"
+      }
+    }
+  ]
+}

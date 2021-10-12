@@ -1,0 +1,224 @@
+version: '3.7'
+services:
+  consul:
+    container_name: consul
+    image: consul
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    ports:
+      - 8500:8500
+  
+  sqlserver-cadastros:
+    container_name: sqlserver-cadastros
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_DATABASE=BoaEntrega
+      - MSSQL_DATA_DIR=/var/opt/mssql
+      - MSSQL_INIT_LOG_LEVEL=0
+      - MSSQL_LOG_LEVEL=0
+      - MSSQL_TCP_PORT=1433
+      - MSSQL_TCP_PORT_EXTERNAL=1433
+      - MSSQL_TCP_PORT_EXTERNAL_WEB=1433
+      - MSSQL_TCP_PORT_WEB=1433
+    ports:
+      - 1433:1433
+
+  sqlserver-notificacoes:
+    container_name: sqlserver-notificacoes
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=BoaEntrega@2019
+      - MSSQL_DATABASE=BoaEntrega
+      - MSSQL_DATA_DIR=/var/opt/mssql
+      - MSSQL_INIT_LOG_LEVEL=0
+      - MSSQL_LOG_LEVEL=0
+      - MSSQL_TCP_PORT=1434
+      - MSSQL_TCP_PORT_EXTERNAL=1434
+      - MSSQL_TCP_PORT_EXTERNAL_WEB=1434
+      - MSSQL_TCP_PORT_WEB=1434
+    ports:
+      - 1434:1434      
+  
+  #eventstore.db:
+  #  container_name: eventstore
+  #  image: eventstore/eventstore:21.6.0-buster-slim
+  #  environment:
+  #    - EVENTSTORE_CLUSTER_SIZE=1
+  #    - EVENTSTORE_RUN_PROJECTIONS=All
+  #    - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+  #    - EVENTSTORE_EXT_TCP_PORT=1113
+  #    - EVENTSTORE_HTTP_PORT=2113
+  #    - EVENTSTORE_INSECURE=true
+  #    - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+  #    - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+  #  ports:
+  #    - 1113:1113
+  #    - 2113:2113
+    
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:management 
+    ports: 
+      - 5672:5672
+      - 15672:15672
+
+  service-identidade-1:
+    image: boaentrega/services/identidade:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.Identidade/Dockerfile
+      context: .
+    container_name: service-identidade-1
+    environment:
+      - ConsulSettings__ServiceId=identidade-service-1
+      - ConsulSettings__ServiceName=identidade-service
+      - ConsulSettings__ServiceHost=service-identidade-1
+      - ConsulSettings__ServicePort=9004
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"
+      - "sqlserver-cadastros"
+      - "rabbitmq"
+
+  service-identidade-2:
+    image: boaentrega/services/identidade:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.Identidade/Dockerfile
+      context: .
+    container_name: service-identidade-2
+    environment:
+      - ConsulSettings__ServiceId=identidade-service-2
+      - ConsulSettings__ServiceName=identidade-service
+      - ConsulSettings__ServiceHost=service-identidade-2
+      - ConsulSettings__ServicePort=9004
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-cadastros"
+      - "rabbitmq"
+      - "service-identidade-1"
+
+  service-notificacoes-1:
+    image: boaentrega/services/notificacoes:service
+    build: 
+      dockerfile: ./src/Notificacoes/BoaEntrega.GSL.Notificacoes.WebApi/Dockerfile
+      context: .
+    container_name: service-notificacoes-1
+    environment:
+      - ConsulSettings__ServiceId=service-notificacoes-1
+      - ConsulSettings__ServiceName=notificacao-service
+      - ConsulSettings__ServiceHost=service-notificacoes-1
+      - ConsulSettings__ServicePort=9003
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-notificacoes"
+      - "rabbitmq"   
+
+  service-notificacoes-2:
+    image: boaentrega/services/notificacoes:service
+    build: 
+      dockerfile: ./src/Notificacoes/BoaEntrega.GSL.Notificacoes.WebApi/Dockerfile
+      context: .
+    container_name: service-notificacoes-2
+    environment:
+      - ConsulSettings__ServiceId=service-notificacoes-2
+      - ConsulSettings__ServiceName=notificacao-service
+      - ConsulSettings__ServiceHost=service-notificacoes-2
+      - ConsulSettings__ServicePort=9003
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-notificacoes"
+      - "rabbitmq"  
+      - "service-notificacoes-1"       
+
+  service-cadastros-1:
+    image: boaentrega/services/cadastros:service
+    build: 
+      dockerfile: ./src/Cadastros/BoaEntrega.GSL.Cadastros.WebApi/Dockerfile
+      context: .
+    container_name: service-cadastros-1
+    environment:
+      - ConsulSettings__ServiceId=cadastros-service-1
+      - ConsulSettings__ServiceName=cadastros-service
+      - ConsulSettings__ServiceHost=service-cadastros-1
+      - ConsulSettings__ServicePort=9001
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-cadastros"
+      - "rabbitmq"
+
+  service-cadastros-2:
+    image: boaentrega/services/cadastros:service
+    build: 
+      dockerfile: ./src/Cadastros/BoaEntrega.GSL.Cadastros.WebApi/Dockerfile
+      context: .
+    container_name: service-cadastros-2
+    environment:
+      - ConsulSettings__ServiceId=service-cadastros-2
+      - ConsulSettings__ServiceName=cadastros-service
+      - ConsulSettings__ServiceHost=service-cadastros-2
+      - ConsulSettings__ServicePort=9001
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-cadastros"
+      - "rabbitmq"
+      - "service-cadastros-1"
+
+  service-mercadorias-1:
+    image: boaentrega/services/mercadorias:service
+    build: 
+      dockerfile: ./src/Mercadorias/BoaEntrega.GSL.Mercadorias.WebApi/Dockerfile
+      context: .
+    container_name: service-mercadorias-1
+    environment:
+      - ConsulSettings__ServiceId=service-mercadorias-1
+      - ConsulSettings__ServiceName=mercadoria-service
+      - ConsulSettings__ServiceHost=service-mercadorias-1
+      - ConsulSettings__ServicePort=9002
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-cadastros"
+      - "rabbitmq"   
+
+  service-mercadorias-2:
+    image: boaentrega/services/mercadorias:service
+    build: 
+      dockerfile: ./src/Mercadorias/BoaEntrega.GSL.Mercadorias.WebApi/Dockerfile
+      context: .
+    container_name: service-mercadorias-2
+    environment:
+      - ConsulSettings__ServiceId=service-mercadorias-2
+      - ConsulSettings__ServiceName=mercadoria-service
+      - ConsulSettings__ServiceHost=service-mercadorias-2
+      - ConsulSettings__ServicePort=9002
+      - ConsulSettings__ServiceDiscoveryAddress=http://consul:8500
+    depends_on:
+      - "consul"  
+      - "sqlserver-cadastros"
+      - "rabbitmq"  
+      - "service-mercadorias-1"         
+
+  api-gateway:
+    image: boaentrega/services/api-gateway:service
+    build: 
+      dockerfile: ./src/BoaEntrega.GSL.ApiGateway/Dockerfile
+      context: .
+    container_name: api-gateway
+    environment:
+      - GlobalConfiguration__Host=consul
+      - GlobalConfiguration__Port=8500
+    ports:
+        - 9000:9000
+    depends_on:
+      - "consul"        
+
