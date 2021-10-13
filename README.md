@@ -1,23 +1,11 @@
-# TCC
+# Boa Entrega - Sistema de Logística
 
-buildar um docker file. Executar na raiz da solution
+Repositório com a POC do sistema de logística da Boa Entrega.
 
+## Executar a POC
+Para executar a POC você deve:
+1. Realizar o clone do reposítorio
+2. Na raiz do projeto executar o comando:
 ```
-docker build -t notificacoes -f "src\BoaEntrega.GSL.Notificacoes\Dockerfile" .
+docker-compose up -d
 ```
-
-subir o docker compose
-```
-docker-compose up -d --build
-```
-
-deletar todas imagens
-```
-docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}"|findstr "boaentrega") 
-```
-
-rodar os testes de carga
-```
-cat tests\load-test\script.js | docker run -i --rm loadimpact/k6 run --vus 20 --duration 30s -
-```
-
