@@ -11,7 +11,7 @@
     {
       "ServiceName": "identidade-service",
       "LoadBalancerOptions": {
-        "Type": "LeastConnection"
+        "Type": "RoundRobin"
       },
       "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "http",
@@ -21,7 +21,7 @@
     {
       "ServiceName": "notificacao-service",
       "LoadBalancerOptions": {
-        "Type": "LeastConnection"
+        "Type": "RoundRobin"
       },
       "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "http",
@@ -41,7 +41,7 @@
     {
       "ServiceName": "cadastros-service",
       "LoadBalancerOptions": {
-        "Type": "LeastConnection"
+        "Type": "RoundRobin"
       },
       "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "http",
@@ -61,7 +61,7 @@
     {
       "ServiceName": "mercadoria-service",
       "LoadBalancerOptions": {
-        "Type": "LeastConnection"
+        "Type": "RoundRobin"
       },
       "DownstreamPathTemplate": "/api/mercadorias/{codigo-rastreamento}",
       "DownstreamScheme": "http",
@@ -71,7 +71,7 @@
     {
       "ServiceName": "mercadoria-service",
       "LoadBalancerOptions": {
-        "Type": "LeastConnection"
+        "Type": "RoundRobin"
       },
       "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "http",

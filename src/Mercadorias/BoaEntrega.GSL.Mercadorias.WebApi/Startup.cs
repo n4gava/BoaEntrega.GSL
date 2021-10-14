@@ -66,7 +66,7 @@ namespace BoaEntrega.GSL.Mercadorias
             }
 
             dbContext.Database.Migrate();
-            app.UseConsul(ConsulSettings);
+            
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
@@ -78,6 +78,7 @@ namespace BoaEntrega.GSL.Mercadorias
                 endpoints.MapControllers();
             });
 
+            app.UseConsul(ConsulSettings);
         }
 
         public static IEdmModel GetEdmModel()
