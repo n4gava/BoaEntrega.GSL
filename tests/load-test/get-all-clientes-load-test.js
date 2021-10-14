@@ -6,7 +6,7 @@ export default function () {
     var params = {
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIyMDM5MGU1My04NDdkLTQ1ZmQtOGJjOC0wNmQzNWMxNTk5OWQiLCJlbWFpbCI6Imd1aWxoZXJtZS5nYXZhenpvbmlAdGVzdGUuY29tIiwiUm9sZSI6IkFkbWluIiwibmJmIjoxNjMzMzkxMzU1LCJleHAiOjE2NjQ5MjczNTUsImlhdCI6MTYzMzM5MTM1NX0.EsAo8KJRbuEaZGXeMA0Jec6XhJwHYiYs6KJkoDP8b14"
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIzNzJhYWNkYy0zMTFjLTQwZTgtOTkwZi1lYTVlZWI2MDFiZDAiLCJlbWFpbCI6InRlc3RlQHRlc3RlLmNvbSIsInVpZCI6IjM3MmFhY2RjLTMxMWMtNDBlOC05OTBmLWVhNWVlYjYwMWJkMCIsIlJvbGUiOlsiQWRtaW4iLCJVc3VhcmlvIl0sIm5iZiI6MTYzNDE2MjE1NiwiZXhwIjoxNjY1Njk4MTU1LCJpYXQiOjE2MzQxNjIxNTZ9.bd6dgCjcBoziB9_9Z8mmYEPspTsTZk6qBgswqJ_pu2I"
         },
     };
 

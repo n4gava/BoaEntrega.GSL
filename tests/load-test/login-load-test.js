@@ -3,7 +3,7 @@ import { sleep } from "k6";
 
 export default function () {
     var payload = JSON.stringify({
-        email: "guilherme.gavazzoni@outlook.com",
+        email: "teste@teste.com",
         password: "123456",
     });
 
